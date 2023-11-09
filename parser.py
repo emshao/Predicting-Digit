@@ -2,8 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-train_data = "..Data\\Train_Arabic_Digit.txt"
-test_data = "..Data\\Test_Arabic_Digit.txt"
+train_data = "C:\\Users\\Emily Shao\\Desktop\\Predicting-Digit\\Data\\Train_Arabic_Digit.txt"
+test_data = "C:\\Users\\Emily Shao\\Desktop\\Predicting-Digit\\Data\\Test_Arabic_Digit.txt"
 
 
 def parse(data_file, speaker=""):
@@ -56,10 +56,6 @@ def get_mfcc(dataset, digit, coef):
         mfcc += forCoef
 
     return mfcc
-
-
-
-
 
 
 
