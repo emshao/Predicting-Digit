@@ -1,31 +1,100 @@
-from parser import *
-from kmeans import *
+import csv
 import numpy as np
-from sklearn.cluster import KMeans
-from sklearn.mixture import GaussianMixture
+import configurations as cfg
+import matplotlib.pyplot as plt
 
-def save_plots(data_object, digit):
-    mfcc1 = get_mfcc(data_object, digit, 1)
-    mfcc2 = get_mfcc(data_object, digit, 2)
-    mfcc3 = get_mfcc(data_object, digit, 3)
 
-    data12, means12, gmm12 = apply_kmeans(mfcc1, mfcc2)
-    data23, means23, gmm23 = apply_kmeans(mfcc2, mfcc3)
-    data13, means13, gmm13 = apply_kmeans(mfcc1, mfcc3)
+def plot_MFCC_lines(digit, mfcc):
+    path = cfg.data_store['digit'] + f'{digit}' + ".csv"
+    data = []
 
-    plot_contours(digit, 1, 2, data12, means12, gmm12, 1)
-    plot_contours(digit, 2, 3, data23, means23, gmm23, 2)
-    plot_contours(digit, 1, 3, data13, means13, gmm13, 3)
+    with open(path,'r') as csv_file:
+        file_info = csv.reader(csv_file)
+
+        for row in file_info:
+            if not len(row):
+                break
+            else:
+                float_row = [float(e) for e in row]
+                data.append(float_row[mfcc-1])
+
+    data = np.array(data)
+
+    plt.plot(np.arange(len(data)), np.abs(data))
+    plt.title(f'Absolute MFCC Magnitudes per Analysis Window for Digit {digit}')
+    plt.xlim(-5, 45)
+    plt.ylim(-0.5, 10)
+
+
+def plot_MFCC_cluster(digit, mfcc):
+    path = cfg.data_store['mfcc'] + f'{digit}' + ".csv"
+    data = []
+    counter = 1
+
+    with open(path,'r') as csv_file:
+        file_info = csv.reader(csv_file)
+
+        for row in file_info:
+            if counter==mfcc:
+                float_row = [float(n) for n in row]
+                data.append(float_row)
+                break
+            counter += 1
     
-    # plt.show()
-    plt.savefig(f'..\\Results\\gmm_{digit}.png')
+    plt.hist(data)
+    plt.title(f'Sample MFCC Histogram for Digit {digit}')
+    plt.xlim(-15, 15)
+    plt.ylim(0, 16000)
+
+
+def plot_2MFCC_scatter(digit, mfcc1, mfcc2):
+    path = cfg.data_store['digit'] + f'{digit}' + ".csv"
+    data_x = []
+    data_y = []
+
+    with open(path,'r') as csv_file:
+        file_info = csv.reader(csv_file)
+
+        for row in file_info:
+            if len(row):
+                float_row = [float(e) for e in row]
+                data_x.append(float_row[mfcc1-1])
+                data_y.append(float_row[mfcc2-1])
+
+    plt.scatter(data_x, data_y)
+    plt.title(f'Pair-Wise Scatter of MFCC {mfcc2} vs MFCC {mfcc1} for Digit {digit}')
+    plt.xlabel(f'MFCC {mfcc1}')
+    plt.ylabel(f'MFCC {mfcc2}')
+    plt.xlim(-15, 15)
+    plt.ylim(-15, 15)
+
+
+def save_plot(save_path):
+    complete_path = cfg.data_save["figures"] + save_path
+    plt.savefig(complete_path)
 
 
 if __name__ == "__main__":
-    
-    training = parse_train_data()
+    for d in range(10):
+        plt.figure()
 
-    for digit in range(10):
-        save_plots(training, digit)
+        for i in range(1, 2):
+            # plot_MFCC_lines(d, i)
+            # plot_MFCC_cluster(d, i)
+            plot_2MFCC_scatter(d, i, i+1)
+ 
+        plt.grid(True)
+        plt.legend([1, 2, 3, 4])
+
+        # save_path = cfg.data_save['mfcc_lines'] + f'{d}.png'
+        # save_path = cfg.data_save['mfcc_histograms'] + f'{d}.png'
+        save_path = cfg.data_save['mfcc_scatters'] + f'{d}.png'
+
+        # save_plot(save_path)
+
+    plt.show()
+
+
+
 
 
