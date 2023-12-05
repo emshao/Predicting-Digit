@@ -2,17 +2,20 @@ data_paths = {
     "train" : "Data\\Train_Arabic_Digit.txt",
     "test" : "Data\\Test_Arabic_Digit.txt",
     "digits" : "Data\\Digit_Data\\",
-    "mfccs" : "Data\\MFCC_Data\\"
+    "mfccs" : "Data\\MFCC_Data\\",
+    "test-digits" : "Data\\Test_Digit_Data\\"
 }
 
 data_dims = {
     "blocks" : 660,
-    "phenomns" : [4, 5, 4, 4, 3, 4, 4, 4, 6, 4]
+    "blocks-test" : 220,
+    "phonemes" : [4, 5, 4, 4, 3, 4, 4, 4, 6, 4]
 }
 
 data_store = {
     "digit" : "Data\\Digit_Data\\digit_",
-    "mfcc" : "Data\\MFCC_Data\\MFCC_digit_"
+    "mfcc" : "Data\\MFCC_Data\\MFCC_digit_",
+    "test-digit" : "Data\\Test_Digit_Data\\digit_"
 }
 
 data_save = {

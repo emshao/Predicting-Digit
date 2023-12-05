@@ -8,9 +8,12 @@ train_data = cfg.data_paths["train"]
 test_data = cfg.data_paths["test"]
 digit_data_folder = cfg.data_paths["digits"]
 MFCC_data_folder = cfg.data_paths["mfccs"]
+test_data_folder = cfg.data_paths["test-digits"]
 
-def get_digit_data(digit, mfcc=13):
+def get_digit_data(digit, mfcc=13, test=False):
     csv_path = digit_data_folder + f'digit_{digit}.csv'
+    if test:
+        csv_path = test_data_folder + f'digit_{digit}_test.csv'
     matrix = []
 
     with open(csv_path, 'r') as open_file:
@@ -19,16 +22,38 @@ def get_digit_data(digit, mfcc=13):
                 matrix.append([float(e) for e in line.split(',')[0:mfcc]])
 
     matrix = np.vstack(matrix)
-
-    print(len(matrix[0]))
-
     return matrix
 
 
-def get_analysis_windows(data_file):
+def count_analysis_windows(digit, mfcc=13, test=False):
+    csv_path = digit_data_folder + f'digit_{digit}.csv'
+    if test:
+        csv_path = test_data_folder + f'digit_{digit}_test.csv'
+    
+    count = []
+    cur_count = 0
+
+    with open(csv_path, 'r') as open_file:
+        for line in open_file:
+            if line != '\n':
+                cur_count += 1
+            else:
+                count.append(cur_count)
+                cur_count = 0
+    
+    print(len(count))
+    print(count)
+    print(sum(count)/len(count))
+
+
+
+
+def get_analysis_windows(data_file, save_path, test=False):
     # make CSV files for all digits
 
     blocks_per_digit = cfg.data_dims["blocks"]
+    if test:
+        blocks_per_digit = cfg.data_dims["blocks-test"]
     block_counter = 0
 
     current_digit = 0
@@ -39,7 +64,9 @@ def get_analysis_windows(data_file):
         for line in open_file:
             if not first_line:
                 if save_file is None:
-                    save_file = digit_data_folder + f'digit_{current_digit}.csv'
+                    save_file = save_path + f'digit_{current_digit}.csv'
+                    if test:
+                        save_file = save_path + f'{current_digit}_test.csv'
                     open_csv = open(save_file, 'w', newline='')
                     csv_writer = csv.writer(open_csv)
                 
@@ -61,14 +88,16 @@ def get_analysis_windows(data_file):
 
 
 
-def get_MFCCs(data_file):
+def get_MFCCs(data_file, save_path, test=False):
     matrix = np.zeros(13).reshape(-1, 1)
 
     blocks_per_digit = cfg.data_dims["blocks"]
     block_counter = -1
 
     current_digit = 0
-    save_file = MFCC_data_folder + f'MFCC_digit_{current_digit}.csv'
+    save_file = save_path + f'MFCC_digit_{current_digit}.csv'
+    if test:
+        save_file = save_path + f'MFCC_digit_{current_digit}-test.csv'
 
     with open(data_file, 'r') as open_file:
         for line in open_file:
@@ -83,7 +112,9 @@ def get_MFCCs(data_file):
                 current_digit += 1
                 block_counter = 0
                 matrix = np.zeros(13).reshape(-1, 1)
-                save_file = MFCC_data_folder + f'MFCC_digit_{current_digit}.csv'
+                save_file = save_path + f'MFCC_digit_{current_digit}.csv'
+                if test:
+                    save_file = save_path + f'MFCC_digit_{current_digit}-test.csv'
 
             else:
                 if line.isspace():
@@ -98,9 +129,11 @@ def get_MFCCs(data_file):
     for row in matrix:
         csv_writer.writerow(row)
 
+    print("Finished creating all MFCC files")
+
 
 def check_size():
-    check = cfg.data_store["mfcc"] + "0.csv"
+    check = cfg.data_store["mfcc"] + "0_test.csv"
     
     open_csv = open(check, 'r', newline='')
     reader = csv.reader(open_csv)
@@ -111,14 +144,17 @@ def check_size():
 
 if __name__ == "__main__":
 
-    data_path_name = cfg.data_store["digit"] + "0.csv"
-    mfcc_path_name = cfg.data_store["mfcc"] + "0.csv"
+    # data_path_name = cfg.data_store["train-digit"] + "0_test.csv"
+    # # mfcc_path_name = cfg.data_store["mfcc"] + "0-test.csv"
 
-    if not pth.isfile(data_path_name):
-        get_analysis_windows(train_data)
+    # if not pth.isfile(data_path_name):
+    #     get_analysis_windows(test_data, cfg.data_store["train-digit"], test=True)
     
-    if not pth.isfile(mfcc_path_name):
-        get_MFCCs(train_data)
+    # # if not pth.isfile(mfcc_path_name):
+    #     get_MFCCs(train_data)
 
-    check_size()
+    # check_size()
 
+
+
+    count_analysis_windows(0)
