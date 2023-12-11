@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 from sklearn import metrics
 import random
 from matplotlib.ticker import MaxNLocator
+from scipy.stats import multivariate_normal
 
 
 # method to get all the training data for each digit
@@ -31,23 +32,80 @@ def train_data(digit):
 # input     data, cluters
 # returns   model
 def train_model(data, clusters, km=True):
+    # KMeans
+    kmeans = KMeans(n_clusters=clusters, random_state=0, n_init='auto')
+    kmeans.fit(data)
 
-    if (km):
-        # KMeans
-        kmeans = KMeans(n_clusters=clusters, random_state=0, n_init='auto')
-        kmeans.fit(data)
+    centers = kmeans.cluster_centers_
+    label_list = kmeans.labels_
 
-        centers = kmeans.cluster_centers_
+    data_by_clusters = []
+    covars = []
+    pis = []
 
-        # EM in GMM
-        gmm = GaussianMixture(n_components=clusters, means_init=centers, covariance_type='full')
-    else:
-        gmm = GaussianMixture(n_components=clusters, init_params='random', covariance_type='full')
+    for i in range(clusters):
+        indices = [n for n, val in enumerate(label_list) if val==i]
+        cluster_data = []
+        for ind in indices:
+            demeaned_data = data[ind] - centers[i]
+            cluster_data.append(demeaned_data)
+        data_by_clusters.append(cluster_data)
+
+        covariance = np.cov(cluster_data) # 13 * 13 dim data
+
+        covars.append(covariance)
+
+        pis.append(len(cluster_data) / len(data))
     
-    gmm.fit(data)
 
-    return gmm
+    return centers, covars, pis
 
+
+def generate_model_Kmeans(data, pis, means, covars, digit):
+
+    means1n2 = means[:,0:2]
+    covar1n2 = []
+
+    for cov in covars:
+        first_two = cov[0][0:2]
+        second = cov[1][0:2]
+        covar1n2.append([first_two, second])
+
+    
+    data1n2 = [n[0:2] for n in data]
+
+
+    print(np.array(data1n2).shape)
+    print(data1n2[0][1])
+    x_val = [n[0] for n in data1n2]
+    y_val = [n[1] for n in data1n2]
+
+    x = np.linspace(min(x_val), max(x_val), num=150)
+    y = np.linspace(min(y_val), max(y_val), num=150)
+    
+    X, Y = np.meshgrid(x, y)
+    XX = np.dstack((X, Y))
+
+
+    pdf = np.array([[[0.0] * 150] * 150])
+
+    for i in range(len(pis)):
+        rv = multivariate_normal(means1n2[i], covar1n2[i], seed=0)
+        pdf = np.add(pdf, (pis[i] * np.array(rv.pdf(XX))))
+
+
+    plt.figure()
+    plt.contourf(X, Y, pdf[0], alpha=1)
+
+    plt.scatter(x_val, y_val, s=1, alpha=0.1)
+
+    plt.scatter(means1n2[:, 0], means1n2[:, 1], s=30, c='red', alpha=0.7, marker='.')
+
+    plt.title(f"KMeans Clusting Model Output for MFCC 1 vs MFCC 2 for Digit {digit}")
+    plt.xlabel("MFCC 1")
+    plt.ylabel("MFCC 2")
+
+    plt.savefig(f"C:/Users/Emily Shao/Desktop/Predicting-Digit/Results/kmeans_for_{digit}.png")
 
 # method to get all the testing data for each digit 
 # results return in list form of size number_of_utterances
@@ -197,18 +255,20 @@ def create_confusion_matrix(actual, predicted, show=False):
     return accuracy_per_digit
     
 
-# train0 = train_data(0)
-# train1 = train_data(1)
-# train2 = train_data(2)
-# train3 = train_data(3)
-# train4 = train_data(4)
-# train5 = train_data(5)
-# train6 = train_data(6)
-# train7 = train_data(7)
-# train8 = train_data(8)
-# train9 = train_data(9)
+train0 = train_data(0)
+train1 = train_data(1)
+train2 = train_data(2)
+train3 = train_data(3)
+train4 = train_data(4)
+train5 = train_data(5)
+train6 = train_data(6)
+train7 = train_data(7)
+train8 = train_data(8)
+train9 = train_data(9)
 
-# print("obtained training data")
+print("obtained training data")
+
+all_train = [train0, train1, train2, train3, train4, train5, train6, train7, train8, train9]
 
 # test0 = test_data(0)
 # test1 = test_data(1)
@@ -233,8 +293,9 @@ def create_confusion_matrix(actual, predicted, show=False):
 # #     if (i==9):
 # #         ten = True
 
-# useKM = True
-# gmm0 = train_model(train0, 6, useKM)
+for i in range(len(all_train)):
+    useKM = True
+    centers, covars, pis = train_model(all_train[i], 6, useKM)
 # gmm1 = train_model(train1, 6, useKM)
 # gmm2 = train_model(train2, 6, useKM)
 # gmm3 = train_model(train3, 6, useKM)
@@ -247,7 +308,10 @@ def create_confusion_matrix(actual, predicted, show=False):
 
 # all_gmm = [gmm0, gmm1, gmm2, gmm3, gmm4, gmm5, gmm6, gmm7, gmm8, gmm9]
 
-# print("finished training models")
+    print("finished training models")
+
+    generate_model_Kmeans(all_train[i], pis, centers, covars, i)
+
 
 # utterances, labels = create_test_data_and_labels(all_tests, test0)
 # results = run_model_tests(utterances, all_gmm)
@@ -260,93 +324,6 @@ def create_confusion_matrix(actual, predicted, show=False):
 # #     accuracy_list.append(accuracy)
 
 # print(accuracy)
-
-
-
-# from previous runs
-def plot_cluster_accuracies():
-
-    accuracy_list = [[0.6808219178082192, 0.8328767123287671, 0.8762557077625571, 0.869406392694064, 0.8904109589041096, 0.8954337899543379, 0.8981735159817351, 0.9045662100456621, 0.8890410958904109, 0.8707762557077625, 0.8611872146118722, 0.8812785388127854, 0.8634703196347032, 0.865296803652968, 0.8721461187214612, 0.8570776255707763, 0.8570776255707763, 0.8529680365296803, 0.8406392694063927, 0.8424657534246576], [0.6808219178082192, 0.8333333333333334, 0.8908675799086758, 0.8844748858447489, 0.8872146118721461, 0.8876712328767123, 0.8794520547945206, 0.8776255707762557, 0.8831050228310502, 0.8876712328767123, 0.8639269406392694, 0.8643835616438356, 0.8703196347031964, 0.869406392694064, 0.8680365296803653, 0.8648401826484018, 0.8575342465753425, 0.8602739726027397, 0.8534246575342466, 0.8589041095890411], [0.6808219178082192, 0.8328767123287671, 0.8735159817351598, 0.8785388127853881, 0.8885844748858448, 0.908675799086758, 0.8853881278538813, 0.8794520547945206, 0.8840182648401826, 0.8785388127853881, 0.8703196347031964, 0.8557077625570776, 0.85662100456621, 0.8598173515981735, 0.8639269406392694, 0.8616438356164383, 0.8534246575342466, 0.8529680365296803, 0.8488584474885845, 0.8689497716894977], [0.6808219178082192, 0.8812785388127854, 0.8767123287671232, 0.8872146118721461, 0.8844748858447489, 0.9045662100456621, 0.8794520547945206, 0.8817351598173516, 0.8844748858447489, 0.8867579908675799, 0.8744292237442922, 0.8753424657534247, 0.8744292237442922, 0.8776255707762557, 0.8721461187214612, 0.8593607305936073, 0.8776255707762557, 0.8547945205479452, 0.845662100456621, 0.8666666666666667], [0.6808219178082192, 0.8337899543378996, 0.8789954337899544, 0.8812785388127854, 0.8940639269406393, 0.8968036529680365, 0.8858447488584474, 0.8785388127853881, 0.871689497716895, 0.8771689497716895, 0.8785388127853881, 0.8625570776255708, 0.8776255707762557, 0.8794520547945206, 0.8684931506849315, 0.8616438356164383, 0.867579908675799, 0.8643835616438356, 0.8575342465753425, 0.8534246575342466]]
-
-    means = np.sum(accuracy_list, axis=0) / len(accuracy_list)
-    print((means))
-    print(np.arange(20)+1)
-
-    x_val = []
-
-    for i in range(5):
-        for j in range(20):
-            x_val.append(j+1)
-
-    print(len(x_val))
-
-    fig = plt.figure(figsize=(8, 5))
-    ax = fig.gca()
-    pts = []
-
-    for list in accuracy_list:
-        for i in list:
-            pts.append(i)
-
-    print(len(pts))
-
-    plt.scatter(x_val, pts)
-    plt.plot(np.arange(20)+1, means, marker='o', c='orange')
-    ax.xaxis.set_major_locator(MaxNLocator(integer=True))
-    plt.xlabel("Number of Clusters in Model")
-    plt.ylabel("Overall Model Accuracy")
-    plt.title("Accuracy of Model with Different Cluster Numbers")
-    plt.show()
-
-def plot_kmORem_accuracies():
-    
-    yesKM = [0.8981735159817351, 0.8881278538812786, 0.8904109589041096, 0.8926940639269406, 0.8885844748858448]
-    noKM = [0.891324200913242, 0.8995433789954338, 0.8821917808219178, 0.906392694063927, 0.8917808219178082]
-
-    x = np.arange(5) + 1
-
-    plt.figure()
-    plt.plot(x, yesKM)
-    plt.plot(x, noKM)
-    plt.legend(["yes", 'no'])
-    plt.show()
-
-def plot_diagORfull_accuracies():
-
-    with_diag_covariances = [0.9073059360730593, 0.906392694063927, 0.9, 0.9031963470319635, 0.9050228310502283, 0.9077625570776255, 0.9100456621004567, 0.9031963470319635, 0.9050228310502283, 0.9091324200913242]
-    with_full_covariances = [0.8840182648401826, 0.8899543378995434, 0.8949771689497716, 0.8894977168949771, 0.8849315068493151, 0.9009132420091325, 0.8958904109589041, 0.8936073059360731, 0.9059360730593607, 0.8890410958904109]
-
-
-    diag_cov = np.array(with_diag_covariances)[:, np.newaxis]
-    full_cov = np.array(with_full_covariances)[:, np.newaxis]
-
-    kde = KernelDensity(bandwidth=0.01).fit(diag_cov)
-    x_values = np.linspace(0.8, 1.0, 200)
-    log_densities = kde.score_samples(x_values[:, np.newaxis])
-
-    kde_full = KernelDensity(bandwidth=0.01).fit(full_cov)
-    log_densities_full = kde_full.score_samples(x_values[:, np.newaxis])
-
-    plt.figure()
-    plt.plot(x_values, np.exp(log_densities))
-    plt.plot(x_values, np.exp(log_densities_full))
-
-    # plt.figure()
-    plt.scatter(with_diag_covariances, with_diag_covariances)
-    plt.scatter(with_full_covariances, with_full_covariances)
-    plt.legend(["Diagonal", 'Full'])
-    plt.title("KDE for Diagonal- vs Full-Covariance Model Accuracies")
-    plt.show()
-
-
-accuracy_per_digit = [0.9543379, 0.96347032, 0.77625571, 0.89497717, 0.89954338, 0.91780822, 0.95890411, 0.71689498, 0.9086758, 0.91780822]
-x = np.arange(10)
-
-plt.figure()
-plt.bar(x, accuracy_per_digit)
-# plt.text(x, accuracy_per_digit, str(accuracy_per_digit))
-plt.show()
-
 
 
 
