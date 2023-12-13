@@ -107,6 +107,8 @@ def create_confusion_matrix(actual, predicted, mfcc, trial, show=False):
     accuracy = metrics.accuracy_score(actual, predicted)
     accuracy_per_digit = confusion_matrix.diagonal()/confusion_matrix.sum(axis=1)
 
+    accurRound = [round(i, 2) for i in accuracy_per_digit]
+
     if show:
         display_labels = ['0','1','2','3','4','5','6','7','8','9']
         cm_display = metrics.ConfusionMatrixDisplay(confusion_matrix = confusion_matrix, display_labels = display_labels)
@@ -116,13 +118,13 @@ def create_confusion_matrix(actual, predicted, mfcc, trial, show=False):
         # display_label_2 = ['0', '2', '3', '7']
         # acc = [accuracy_per_digit[0], accuracy_per_digit[2], accuracy_per_digit[3], accuracy_per_digit[7]]
 
-        # plt.figure()
-        # plt.bar(display_labels, accuracy_per_digit)
-        # addlabels(display_labels, accuracy_per_digit)
-        # plt.title(f"Accuracy Per Digit with {mfcc} MFCC and 6 Components")
-        # plt.xlabel("Digit")
-        # plt.ylabel("Accuracy")
-        # plt.ylim(0, 1)
+        plt.figure()
+        plt.bar(display_labels, accuracy_per_digit)
+        addlabels(display_labels, accurRound)
+        plt.title(f"Accuracy Per Digit with Varied Components")
+        plt.xlabel("Digit")
+        plt.ylabel("Accuracy (%)")
+        plt.ylim(0, 1)
 
         plt.show()
         # plt.savefig(f"C:\\Users\\Emily Shao\\Desktop\\Predicting-Digit\\Results\\mfcc_trial_{trial}.png")
@@ -135,9 +137,9 @@ def create_confusion_matrix(actual, predicted, mfcc, trial, show=False):
 
 
 # for i in range(8, 11):
-trial = 14
+trial = 16
 
-mfcc = 10
+mfcc = 13
 train0 = train_data(0, mfcc)
 train1 = train_data(1, mfcc)
 train2 = train_data(2, mfcc)
@@ -169,12 +171,12 @@ print("")
 
 gmm0 = return_model(train0, 6) #9, 6c = 97
 gmm1 = return_model(train1, 6) #10 6c = 96
-gmm2 = return_model(train2, 8) #8, 4c = 80 ----> 10, 6c
-gmm3 = return_model(train3, 7) #9, 4c = -------> 9, 7c
-gmm4 = return_model(train4, 7) #7, 6c = 
-gmm5 = return_model(train5, 7) #7, 6c = 
-gmm6 = return_model(train6, 6) #10, 6c = 
-gmm7 = return_model(train7, 7) #8, 7c = 78
+gmm2 = return_model(train2, 5) #8, 4c = 80 ----> 10, 6c
+gmm3 = return_model(train3, 8) #9, 4c = -------> 9, 7c
+gmm4 = return_model(train4, 6) #7, 6c = 
+gmm5 = return_model(train5, 6) #7, 6c = 
+gmm6 = return_model(train6, 5) #10, 6c = 
+gmm7 = return_model(train7, 8) #8, 7c = 78
 gmm8 = return_model(train8, 6) #10, 6c = 90
 gmm9 = return_model(train9, 6) #10, 6c = 91
 
