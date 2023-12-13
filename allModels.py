@@ -12,7 +12,7 @@ from matplotlib.ticker import MaxNLocator
 # results return in matrix form (n_observations, 13)
 # input     digit
 # returns   matrix
-def train_data(digit):
+def train_data(digit, mfcc=13):
     path_to_data = f"Data/Digit_Data/digit_{digit}.csv"
 
     matrix = []
@@ -20,7 +20,7 @@ def train_data(digit):
     with open(path_to_data, 'r') as open_file:
         for line in open_file:
             if line !='\n':
-                matrix.append([float(e) for e in line.split(',')])
+                matrix.append([float(e) for e in line.split(',')][0:mfcc])
 
     data = np.array(matrix)
 
@@ -52,7 +52,7 @@ def train_model(data, clusters):
 # each utterance has size (n_frames, 13)
 # input     digit
 # returns   list
-def test_data(digit):
+def test_data(digit, mfcc=13):
     path_to_test_data = f'Data/Test_Digit_Data/digit_{digit}_test.csv'
 
     utterance_list = []

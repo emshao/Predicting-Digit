@@ -12,7 +12,7 @@ from matplotlib.ticker import MaxNLocator
 # results return in matrix form (n_observations, 13)
 # input     digit
 # returns   matrix
-def train_data(digit):
+def train_data(digit, mfcc=13):
     path_to_data = f"Data/Digit_Data/digit_{digit}.csv"
 
     matrix = []
@@ -20,7 +20,7 @@ def train_data(digit):
     with open(path_to_data, 'r') as open_file:
         for line in open_file:
             if line !='\n':
-                matrix.append([float(e) for e in line.split(',')])
+                matrix.append([float(e) for e in line.split(',')][0:mfcc])
 
     data = np.array(matrix)
 
@@ -54,7 +54,7 @@ def train_model(data, clusters, km=True):
 # each utterance has size (n_frames, 13)
 # input     digit
 # returns   list
-def test_data(digit):
+def test_data(digit, mfcc=13):
     path_to_test_data = f'Data/Test_Digit_Data/digit_{digit}_test.csv'
 
     utterance_list = []
@@ -67,7 +67,7 @@ def test_data(digit):
                 current_utterance = []
             else:
                 # append frame as a part of utterance
-                current_utterance.append([float(e) for e in line.split(',')])
+                current_utterance.append([float(e) for e in line.split(',')][0:mfcc])
 
     return utterance_list
 
@@ -191,35 +191,37 @@ def create_confusion_matrix(actual, predicted, show=False):
         display_labels = ['0','1','2','3','4','5','6','7','8','9']
         cm_display = metrics.ConfusionMatrixDisplay(confusion_matrix = confusion_matrix, display_labels = display_labels)
         cm_display.plot()
-        plt.title("Accuracy = " + str(accuracy))
+        # plt.title("Accuracy = " + str(accuracy))
+        plt.title("EM Model, 6 Clusters, 7 MFCC Digits, Overall Accuracy = " + str(accuracy))
         plt.show()
 
     return accuracy_per_digit
     
+# mfcc = 8
 
-# train0 = train_data(0)
-# train1 = train_data(1)
-# train2 = train_data(2)
-# train3 = train_data(3)
-# train4 = train_data(4)
-# train5 = train_data(5)
-# train6 = train_data(6)
-# train7 = train_data(7)
-# train8 = train_data(8)
-# train9 = train_data(9)
+# train0 = train_data(0, mfcc)
+# train1 = train_data(1, mfcc)
+# train2 = train_data(2, mfcc)
+# train3 = train_data(3, mfcc)
+# train4 = train_data(4, mfcc)
+# train5 = train_data(5, mfcc)
+# train6 = train_data(6, mfcc)
+# train7 = train_data(7, mfcc)
+# train8 = train_data(8, mfcc)
+# train9 = train_data(9, mfcc)
 
 # print("obtained training data")
 
-# test0 = test_data(0)
-# test1 = test_data(1)
-# test2 = test_data(2)
-# test3 = test_data(3)
-# test4 = test_data(4)
-# test5 = test_data(5)
-# test6 = test_data(6)
-# test7 = test_data(7)
-# test8 = test_data(8)
-# test9 = test_data(9)
+# test0 = test_data(0, mfcc)
+# test1 = test_data(1, mfcc)
+# test2 = test_data(2, mfcc)
+# test3 = test_data(3, mfcc)
+# test4 = test_data(4, mfcc)
+# test5 = test_data(5, mfcc)
+# test6 = test_data(6, mfcc)
+# test7 = test_data(7, mfcc)
+# test8 = test_data(8, mfcc)
+# test9 = test_data(9, mfcc)
 
 # all_tests = [test0, test1, test2, test3, test4, test5, test6, test7, test8, test9]
 
@@ -233,7 +235,7 @@ def create_confusion_matrix(actual, predicted, show=False):
 # #     if (i==9):
 # #         ten = True
 
-# useKM = True
+# useKM = False
 # gmm0 = train_model(train0, 6, useKM)
 # gmm1 = train_model(train1, 6, useKM)
 # gmm2 = train_model(train2, 6, useKM)
@@ -334,18 +336,26 @@ def plot_diagORfull_accuracies():
     # plt.figure()
     plt.scatter(with_diag_covariances, with_diag_covariances)
     plt.scatter(with_full_covariances, with_full_covariances)
-    plt.legend(["Diagonal", 'Full'])
-    plt.title("KDE for Diagonal- vs Full-Covariance Model Accuracies")
+    plt.legend(["Full", 'Diagonal'])
+    plt.title("KDE for Full- vs Diagonal-Covariance Model Accuracies")
+    plt.xlabel("Model Accuracies")
+    plt.ylabel("Relative Density")
     plt.show()
 
 
-accuracy_per_digit = [0.9543379, 0.96347032, 0.77625571, 0.89497717, 0.89954338, 0.91780822, 0.95890411, 0.71689498, 0.9086758, 0.91780822]
-x = np.arange(10)
+plot_diagORfull_accuracies()
 
-plt.figure()
-plt.bar(x, accuracy_per_digit)
-# plt.text(x, accuracy_per_digit, str(accuracy_per_digit))
-plt.show()
+
+# accuracy_per_digit = [0.9543379, 0.96347032, 0.77625571, 0.89497717, 0.89954338, 0.91780822, 0.95890411, 0.71689498, 0.9086758, 0.91780822]
+# x = np.arange(10)
+
+# plt.figure()
+# plt.bar(x, accuracy_per_digit)
+# plt.title("Accuracy per Digit of Model with 6 Clusters")
+# plt.xlabel("Digit Number")
+# plt.ylabel("Accuracy (%)")
+# # plt.text(x, accuracy_per_digit, str(accuracy_per_digit))
+# plt.show()
 
 
 

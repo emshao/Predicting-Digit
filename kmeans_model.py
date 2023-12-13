@@ -105,7 +105,7 @@ def generate_model_Kmeans(data, pis, means, covars, digit):
     plt.xlabel("MFCC 1")
     plt.ylabel("MFCC 2")
 
-    plt.savefig(f"C:/Users/Emily Shao/Desktop/Predicting-Digit/Results/kmeans_for_{digit}.png")
+    plt.savefig("C:/Users/Emily Shao/Desktop/Predicting-Digit/Results/kmeans_for_{digit}.png")
 
 # method to get all the testing data for each digit 
 # results return in list form of size number_of_utterances
