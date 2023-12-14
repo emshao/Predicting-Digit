@@ -131,78 +131,78 @@ def create_confusion_matrix(actual, predicted, mfcc, show=False):
     return accuracy_per_digit
 
 
-# mfcc_acc = []
+mfcc_acc = []
   
-# for i in range(13):
-#     mfcc = i+1
+for i in range(13):
+    mfcc = i+1
 
-#     train0 = train_data(0, mfcc)
-#     train1 = train_data(1, mfcc)
-#     train2 = train_data(2, mfcc)
-#     train3 = train_data(3, mfcc)
-#     train4 = train_data(4, mfcc)
-#     train5 = train_data(5, mfcc)
-#     train6 = train_data(6, mfcc)
-#     train7 = train_data(7, mfcc)
-#     train8 = train_data(8, mfcc)
-#     train9 = train_data(9, mfcc)
+    train0 = train_data(0, mfcc)
+    train1 = train_data(1, mfcc)
+    train2 = train_data(2, mfcc)
+    train3 = train_data(3, mfcc)
+    train4 = train_data(4, mfcc)
+    train5 = train_data(5, mfcc)
+    train6 = train_data(6, mfcc)
+    train7 = train_data(7, mfcc)
+    train8 = train_data(8, mfcc)
+    train9 = train_data(9, mfcc)
 
-#     print("obtained training data")
+    print("obtained training data")
 
-#     test0 = test_data(0, mfcc)
-#     test1 = test_data(1, mfcc)
-#     test2 = test_data(2, mfcc)
-#     test3 = test_data(3, mfcc)
-#     test4 = test_data(4, mfcc)
-#     test5 = test_data(5, mfcc)
-#     test6 = test_data(6, mfcc)
-#     test7 = test_data(7, mfcc)
-#     test8 = test_data(8, mfcc)
-#     test9 = test_data(9, mfcc)
+    test0 = test_data(0, mfcc)
+    test1 = test_data(1, mfcc)
+    test2 = test_data(2, mfcc)
+    test3 = test_data(3, mfcc)
+    test4 = test_data(4, mfcc)
+    test5 = test_data(5, mfcc)
+    test6 = test_data(6, mfcc)
+    test7 = test_data(7, mfcc)
+    test8 = test_data(8, mfcc)
+    test9 = test_data(9, mfcc)
 
-#     all_tests = [test0, test1, test2, test3, test4, test5, test6, test7, test8, test9]
+    all_tests = [test0, test1, test2, test3, test4, test5, test6, test7, test8, test9]
 
-#     print("obtained testing data")
+    print("obtained testing data")
 
-#     # accuracy_list = []
-#     # useKM = False
+    # accuracy_list = []
+    # useKM = False
 
-#     # for i in range(10):
-#     #     ten = False
-#     #     if (i==9):
-#     #         ten = True
+    # for i in range(10):
+    #     ten = False
+    #     if (i==9):
+    #         ten = True
 
-#     useKM = False
-#     gmm0 = train_model(train0, 6, useKM)
-#     gmm1 = train_model(train1, 6, useKM)
-#     gmm2 = train_model(train2, 6, useKM)
-#     gmm3 = train_model(train3, 6, useKM)
-#     gmm4 = train_model(train4, 6, useKM)
-#     gmm5 = train_model(train5, 6, useKM)
-#     gmm6 = train_model(train6, 6, useKM)
-#     gmm7 = train_model(train7, 6, useKM)
-#     gmm8 = train_model(train8, 6, useKM)
-#     gmm9 = train_model(train9, 6, useKM)
+    useKM = False
+    gmm0 = train_model(train0, 6, useKM)
+    gmm1 = train_model(train1, 6, useKM)
+    gmm2 = train_model(train2, 6, useKM)
+    gmm3 = train_model(train3, 6, useKM)
+    gmm4 = train_model(train4, 6, useKM)
+    gmm5 = train_model(train5, 6, useKM)
+    gmm6 = train_model(train6, 6, useKM)
+    gmm7 = train_model(train7, 6, useKM)
+    gmm8 = train_model(train8, 6, useKM)
+    gmm9 = train_model(train9, 6, useKM)
 
-#     all_gmm = [gmm0, gmm1, gmm2, gmm3, gmm4, gmm5, gmm6, gmm7, gmm8, gmm9]
+    all_gmm = [gmm0, gmm1, gmm2, gmm3, gmm4, gmm5, gmm6, gmm7, gmm8, gmm9]
 
-#     print("finished training models")
+    print("finished training models")
 
-#     utterances, labels = create_test_data_and_labels(all_tests, test0)
-#     results = run_model_tests(utterances, all_gmm)
-#     #     show = False
-#     #     if (ten):
-#     #         show = True
+    utterances, labels = create_test_data_and_labels(all_tests, test0)
+    results = run_model_tests(utterances, all_gmm)
+    #     show = False
+    #     if (ten):
+    #         show = True
 
-#     accuracy = create_confusion_matrix(labels, results, mfcc, show=True)
+    accuracy = create_confusion_matrix(labels, results, mfcc, show=True)
 
-#     #     accuracy_list.append(accuracy)
+    #     accuracy_list.append(accuracy)
 
-#     # print(accuracy)
-#     mfcc_acc.append((np.mean(accuracy)))
+    # print(accuracy)
+    mfcc_acc.append((np.mean(accuracy)))
 
 
-# print(mfcc_acc)
+print(mfcc_acc)
 
 
 def show_avg_mfcc_accuracies():

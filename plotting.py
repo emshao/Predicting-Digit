@@ -2,6 +2,8 @@ import csv
 import numpy as np
 import configurations as cfg
 import matplotlib.pyplot as plt
+from sklearn.cluster import KMeans
+from sklearn.mixture import GaussianMixture
 
 
 def plot_MFCC_lines(digit, mfcc):
@@ -27,6 +29,19 @@ def plot_MFCC_lines(digit, mfcc):
     plt.ylabel("Value of MFCC")
     plt.xlim(-2, 45)
     # plt.ylim(-0.5, 10)
+
+
+# plt.figure()
+# for i in range(1, 14):
+#     plot_MFCC_lines(7, i)
+
+# plt.title(f'MFCCs per Analysis Window for Digit 7')
+# plt.xlabel("Analysis Window")
+# plt.ylabel("Value of MFCC")
+# plt.xlim(-2, 55)
+# plt.grid(True)
+# plt.legend([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13])
+# plt.show()
 
 
 def plot_MFCC_cluster(digit, mfcc):
@@ -64,12 +79,24 @@ def plot_2MFCC_scatter(digit, mfcc1, mfcc2):
                 data_x.append(float_row[mfcc1-1])
                 data_y.append(float_row[mfcc2-1])
 
-    plt.scatter(data_x, data_y)
-    plt.title(f'Pair-Wise Scatter of MFCC {mfcc2} vs MFCC {mfcc1} for Digit {digit}')
+    data = list(zip(data_x, data_y))
+
+    # kmeans = KMeans(n_clusters=6, random_state=0, n_init='auto')
+    # kmeans.fit(data)
+
+    gmm = GaussianMixture(n_components=6, covariance_type='full')  
+    labels = gmm.fit_predict(data)
+
+    plt.scatter(data_x, data_y, c=labels)
+    plt.title(f'EM Grouping of MFCC {mfcc2} vs MFCC {mfcc1} for Digit {digit}')
     plt.xlabel(f'MFCC {mfcc1}')
     plt.ylabel(f'MFCC {mfcc2}')
     plt.xlim(-15, 15)
     plt.ylim(-15, 15)
+
+plt.figure()
+plot_2MFCC_scatter(4, 1, 2)
+plt.show()
 
 def plot_3MFCC_3D(digit, mfcc1, mfcc2, mfcc3):
     path = cfg.data_store['digit'] + f'{digit}' + ".csv"
@@ -99,26 +126,26 @@ def save_plot(save_path):
     plt.savefig(complete_path)
 
 
-if __name__ == "__main__":
-    for d in range(1):
-        plt.figure()
+# if __name__ == "__main__":
+#     for d in range(1):
+#         plt.figure()
 
-        for i in range(1, 13):
-            plot_MFCC_lines(d, i)
-            # plot_MFCC_cluster(d, i)
-            # plot_2MFCC_scatter(d, i, i+1)
-            # plot_3MFCC_3D(d, i, i+1, i+2)
+#         for i in range(1, 13):
+#             plot_MFCC_lines(d, i)
+#             # plot_MFCC_cluster(d, i)
+#             # plot_2MFCC_scatter(d, i, i+1)
+#             # plot_3MFCC_3D(d, i, i+1, i+2)
  
-        plt.grid(True)
-        plt.legend([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13])
+#         plt.grid(True)
+#         plt.legend([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13])
 
-        # save_path = cfg.data_save['mfcc_lines'] + f'{d}.png'
-        # save_path = cfg.data_save['mfcc_histograms'] + f'{d}.png'
-        # save_path = cfg.data_save['mfcc_scatters'] + f'{d}.png'
+#         # save_path = cfg.data_save['mfcc_lines'] + f'{d}.png'
+#         # save_path = cfg.data_save['mfcc_histograms'] + f'{d}.png'
+#         # save_path = cfg.data_save['mfcc_scatters'] + f'{d}.png'
 
-        # save_plot(save_path)
+#         # save_plot(save_path)
 
-    plt.show()
+#     plt.show()
 
 
 

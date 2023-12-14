@@ -82,9 +82,7 @@ def get_log_densities_per_utterance(one_utterance, gmm_list):
     log_LH = []
 
     for gmm in gmm_list:
-        log_lh_frames = gmm.score_samples(one_utterance)
-        log_lh_utterance = np.sum(log_lh_frames) # just like multiplying probability for all the frames
-        log_LH.append(log_lh_utterance * len(one_utterance))
+        gmm.predict(one_utterance)
 
     return log_LH.index(max(log_LH))
 
@@ -141,7 +139,7 @@ def create_confusion_matrix(actual, predicted, mfcc, trial, show=False):
 
 
 # for i in range(8, 11):
-trial = 17
+trial = 16
 
 mfcc = 13
 train0 = train_data(0, mfcc)
@@ -173,25 +171,14 @@ all_tests = [test0, test1, test2, test3, test4, test5, test6, test7, test8, test
 print("obtained testing data")
 print("")
 
-# gmm0 = return_model(train0, 6) #9, 6c = 97
-# gmm1 = return_model(train1, 6) #10 6c = 96
-# gmm2 = return_model(train2, 5) #8, 4c = 80 ----> 10, 6c
-# gmm3 = return_model(train3, 8) #9, 4c = -------> 9, 7c
-# gmm4 = return_model(train4, 6) #7, 6c = 
-# gmm5 = return_model(train5, 6) #7, 6c = 
-# gmm6 = return_model(train6, 5) #10, 6c = 
-# gmm7 = return_model(train7, 8) #8, 7c = 78
-# gmm8 = return_model(train8, 6) #10, 6c = 90
-# gmm9 = return_model(train9, 6) #10, 6c = 91
-
 gmm0 = return_model(train0, 6) #9, 6c = 97
 gmm1 = return_model(train1, 6) #10 6c = 96
-gmm2 = return_model(train2, 8) #8, 4c = 80 ----> 10, 6c
-gmm3 = return_model(train3, 8) #9, 4c = -------> 9, 7c
+gmm2 = return_model(train2, 6) #8, 4c = 80 ----> 10, 6c
+gmm3 = return_model(train3, 6) #9, 4c = -------> 9, 7c
 gmm4 = return_model(train4, 6) #7, 6c = 
 gmm5 = return_model(train5, 6) #7, 6c = 
 gmm6 = return_model(train6, 6) #10, 6c = 
-gmm7 = return_model(train7, 8) #8, 7c = 78
+gmm7 = return_model(train7, 6) #8, 7c = 78
 gmm8 = return_model(train8, 6) #10, 6c = 90
 gmm9 = return_model(train9, 6) #10, 6c = 91
 
